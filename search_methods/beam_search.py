@@ -1,4 +1,3 @@
-from sokoban import Map
 
-def beam_search(map : Map):
+def beam_search(map, heuristic):
     pass

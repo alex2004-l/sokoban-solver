@@ -1,13 +1,17 @@
 from sokoban import Box, DOWN, Map, Player
 from search_methods.solver import Solver
 from search_methods.heuristics import heuristic
+import os
 
 if __name__ == '__main__':
-    map_from_yaml = Map.from_yaml('tests/easy_map2.yaml')
+    test_directory = "tests"
 
-    plot_flag = True
-    crt_map = map_from_yaml
+    for test in os.listdir(test_directory):
+        test_name = os.path.join(test_directory, test)
+        crt_map = Map.from_yaml(test_name)
+        test = test.split(".")[0]
+        print(f"Start solving {test}")
 
-    solver = Solver(crt_map, heuristic)
-
-    solver.solve_ida_star()
+        solver = Solver(crt_map, heuristic, test)
+        solver.solve()
+        print(f"Finished processing test {test}")
