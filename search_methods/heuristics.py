@@ -14,6 +14,6 @@ def heuristic(state):
         nr = []
         for target in target_positions:
             nr.append(manhattan_dist(target, box))
-        r.append(nr)
+        r.append(min(nr))
     
-    return min_dist_player
+    return min_dist_player + sum(r)
