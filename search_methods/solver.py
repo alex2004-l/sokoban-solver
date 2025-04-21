@@ -10,21 +10,21 @@ class Solver:
         self.testname = testname
 
     def solve(self):
-        self.solve_ida_star()
-        # self.solve_beam_search()
+        # self.solve_ida_star()
+        self.solve_beam_search()
 
     def solve_ida_star(self):
         ida_result = ida_star(self.map, self.heuristic)
         if not ida_result:
             print("Ida* didn't find a solution")
         else:
-            save_images(ida_result, os.path.join("images", self.testname))
-            create_gif(os.path.join("images", self.testname), self.testname, "gif")
+            save_images(ida_result, os.path.join("images", self.testname, "ida_star"))
+            create_gif(os.path.join("images", self.testname, "ida_star"), self.testname, os.path.join("gif", "ida_star"))
 
     def solve_beam_search(self):
-        beam_search_result = beam_search(self.map, self.heuristic)
+        beam_search_result = beam_search(self.map, self.heuristic, 20, 8000)
         if not beam_search_result:
             print("Beam search didn't find a solution")
         else:
-            save_images(beam_search_result, os.path.join("images", self.testname))
-            create_gif(os.path.join("images", self.testname), self.testname, "gif")
+            save_images(beam_search_result, os.path.join("images", self.testname, "beam_search"))
+            create_gif(os.path.join("images", self.testname, "beam_search"), self.testname,  os.path.join("gif", "beam_search"))
