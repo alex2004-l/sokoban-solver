@@ -2,3 +2,5 @@ sokoban/__pycache__
 images/*
 search_methods/__pycache__
 gif/*
+benchmark/results/
+benchmark/__pycache__

@@ -283,6 +283,14 @@ class Map:
 
         return True
 
+    def filter_possible_moves_without_pull(self):
+        ''' Returns the possible moves the player can make'''
+        possible_moves = []
+        for move in range(LEFT, DOWN + 1):
+            if self.is_valid_move(move):
+                possible_moves.append(move)
+        return possible_moves
+
     def filter_possible_moves(self):
         ''' Returns the possible moves the player can make'''
         possible_moves = []
@@ -303,7 +311,7 @@ class Map:
     def get_neighbours(self):
         ''' Returns the neighbours of the current state'''
         neighbours = []
-        for move in self.filter_possible_moves():
+        for move in self.filter_possible_moves_without_pull():
             new_map = self.copy()
             new_map.apply_move(move)
             neighbours.append(new_map)
@@ -412,3 +420,6 @@ class Map:
         pieces = name.split('\n')
         aligned_corner  = reversed(pieces)
         return '\n'.join(aligned_corner)
+
+    def serialize(self):
+        return self.__str__()
