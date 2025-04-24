@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 from typing import Optional
 import yaml
 import os
-
+import sys
 
 OBSTACLE_SYMBOL = 1
 BOX_SYMBOL = 2
@@ -310,6 +310,15 @@ class Map:
 
     def get_neighbours(self):
         ''' Returns the neighbours of the current state'''
+        neighbours = []
+        for move in self.filter_possible_moves():
+            new_map = self.copy()
+            new_map.apply_move(move)
+            neighbours.append(new_map)
+        return neighbours
+    
+    def get_neighbours_without_pull_moves(self):
+        '''Returns the neighbours of the current state after filtering the pull moves'''
         neighbours = []
         for move in self.filter_possible_moves_without_pull():
             new_map = self.copy()

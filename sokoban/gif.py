@@ -47,4 +47,4 @@ def create_gif(path_images, gif_name, save_path):
         images.append(imageio.imread(filename))
 
     imageio.mimsave(f'{save_path}/{gif_name}', images, 'GIF-FI', duration=0.5)
-    print(f"GIF saved at: {f'{save_path}/{gif_name}'}")
+    # print(f"GIF saved at: {f'{save_path}/{gif_name}'}")
