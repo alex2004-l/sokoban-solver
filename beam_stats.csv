@@ -1,0 +1,9 @@
+name,method,explored_states,solution_length,undo_moves,time
+easy_map1,beam_search,168,19,0,0.024179458618164062
+easy_map2,beam_search,112,9,0,0.009467840194702148
+hard_map1,beam_search,1132,31,0,0.1767590045928955
+hard_map2,beam_search,1291,38,0,0.18653225898742676
+large_map1,beam_search,875,29,0,0.175750732421875
+large_map2,beam_search,2159,50,0,0.5486047267913818
+medium_map1,beam_search,740,21,0,0.17790865898132324
+medium_map2,beam_search,1117,32,0,0.18269062042236328

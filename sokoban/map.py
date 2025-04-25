@@ -432,3 +432,20 @@ class Map:
 
     def serialize(self):
         return self.__str__()
+    
+    def check_corner(self, coord):
+        row, column = coord
+        left = column - 1 < 0 or self.map[row][column - 1] == OBSTACLE_SYMBOL
+        right = column + 1 >= self.width or self.map[row][column + 1] == OBSTACLE_SYMBOL
+        above = row - 1 < 0 or self.map[row - 1][column] == OBSTACLE_SYMBOL
+        below = row + 1 >= self.length or self.map[row + 1][column] == OBSTACLE_SYMBOL
+        if (left and above) or (left and below) or (right and above) or (right and below):
+            return True
+        return False
+
+    def box_on_corner(self):
+        for target in self.targets:
+            if target in self.positions_of_boxes and self.check_corner(target):
+                self.targets.remove(target)
+                self.positions_of_boxes.pop(target)
+

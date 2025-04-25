@@ -1,18 +1,13 @@
 from sokoban.map import Map, OBSTACLE_SYMBOL, BOX_SYMBOL, TARGET_SYMBOL
 
-def get_deadlock_cells(start_state : Map):
+def static_deadlock_cells(start_state : Map):
     c_map = start_state.map
     result = []
     for row in range(len(c_map)):
         for column in range(len(c_map[0])):
             if c_map[row][column] == 0:
-                left = column - 1 < 0 or c_map[row][column - 1] == OBSTACLE_SYMBOL
-                right = column + 1 >= start_state.width or c_map[row][column + 1] == OBSTACLE_SYMBOL
-                above = row - 1 < 0 or c_map[row - 1][column] == OBSTACLE_SYMBOL
-                below = row + 1 >= start_state.length or c_map[row + 1][column] == OBSTACLE_SYMBOL
-                if (left and above) or (left and below) or (right and above) or (right and below):
+                if start_state.check_corner((row, column)):
                     result.append((row, column))
-    # print(result)
     second_result = set()
 
     # left
@@ -46,16 +41,15 @@ def get_deadlock_cells(start_state : Map):
                     if c_map[r][col_i] == TARGET_SYMBOL:
                         not_deadlock = True
                         break
-                
+
             if not not_deadlock:
                 for c in current_set:
-                    # print(f"Adding {c}")
                     second_result.add(c)
 
     for s in result:
         second_result.add(s)
-    print(second_result)
     return second_result
+
 
 def check_deadlock(state : Map, deadlock_cells = None):
     if not deadlock_cells:

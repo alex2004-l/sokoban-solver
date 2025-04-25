@@ -1,0 +1,9 @@
+name,method,explored_states,solution_length,undo_moves,time
+easy_map1,ida_star,1999,19,0,0.07381391525268555
+easy_map2,ida_star,95,9,0,0.011542081832885742
+hard_map1,ida_star,37303,31,0,2.448368549346924
+hard_map2,ida_star,160896,38,0,6.883111476898193
+large_map1,ida_star,15945,29,0,0.7423722743988037
+large_map2,ida_star,3019722,40,0,162.71758580207825
+medium_map1,ida_star,31627,21,0,1.442732334136963
+medium_map2,ida_star,73801,32,0,3.663360595703125

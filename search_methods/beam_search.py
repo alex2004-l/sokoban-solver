@@ -1,4 +1,4 @@
-from search_methods.utils import get_deadlock_cells, check_deadlock
+from search_methods.utils import static_deadlock_cells, check_deadlock
 
 def beam_search(start, heuristic, beam_width, limit):
     beam = [(start, [], heuristic(start))]
@@ -7,7 +7,7 @@ def beam_search(start, heuristic, beam_width, limit):
     discovered.add(start.serialize())
     explored_states = 0
 
-    deadlock_cells = get_deadlock_cells(start)
+    deadlock_cells = static_deadlock_cells(start)
 
     while beam and len(discovered) < limit:
         successors = []
@@ -15,7 +15,7 @@ def beam_search(start, heuristic, beam_width, limit):
             explored_states += 1
             if state.is_solved():
                 return seq, explored_states
-            for neigh in state.get_neighbours(): 
+            for neigh in state.get_neighbours_without_pull_moves(): 
                 if check_deadlock(neigh, deadlock_cells):
                     continue
                 if neigh.serialize() not in discovered:

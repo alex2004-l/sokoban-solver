@@ -1,43 +1,63 @@
 from sokoban.gif import save_images, create_gif
 from search_methods.ida_star import ida_star
 from search_methods.beam_search import beam_search
+from sokoban.map import Map
+from typing import Callable
+import pandas as pd
 import os
 import time
-from search_methods.utils import get_deadlock_cells
 
+IDA_STAR = "ida_star"
+BEAM_SEARCH = "beam_search"
+BEAM_WIDTH = 30
+BEAM_LIMIT = 1000000
 
 class Solver:
-    def __init__(self, map, heuristic, testname) -> None:
+    def __init__(self, map: Map, heuristic : Callable, testname : str, cache_heuristic : bool = False) -> None:
         self.map = map
         self.heuristic = heuristic
         self.testname = testname
+        self.statistics = []
+        # Add heuristic precalculation
+        if cache_heuristic:
+            self.heuristic_cost = {}
 
     def solve(self):
         self.solve_ida_star()
         self.solve_beam_search()
+        print(self.statistics)
+
+    def generic_solve(self, alg_name: str, func : Callable, *args):
+        start_time = time.time()
+        result, explored_states = func(self.map, self.heuristic, *args)
+        total_time = time.time() - start_time
+
+        print(f"{self.testname} - {total_time}")
+
+        if not result:
+            print(f"{alg_name} didn't find a result")
+        else:
+            last_state = result[len(result) - 1]
+            self.save_result__as_gif(result, alg_name)
+            self.statistics.append(self.get_statistics(last_state, explored_states, alg_name, total_time))
 
     def solve_ida_star(self):
-        startTime = time.time()
-        ida_result, explored_states = ida_star(self.map, self.heuristic)
-        print(f"{self.testname} - {time.time() - startTime}")
-        if not ida_result:
-            print("Ida* didn't find a solution")
-        else:
-            self.__save__result__as_gif(ida_result,"ida_star", explored_states)
+        self.generic_solve(IDA_STAR, ida_star)
 
     def solve_beam_search(self):
-        startTime = time.time()
-        beam_search_result, explored_states = beam_search(self.map, self.heuristic, 50, 10000000)
-        print(f"{self.testname} - {time.time() - startTime}")
-        if not beam_search_result:
-            print("Beam search didn't find a solution")
-        else:
-            self.__save__result__as_gif(beam_search_result,"beam_search", explored_states)
+        self.generic_solve(BEAM_SEARCH, beam_search, BEAM_WIDTH, BEAM_LIMIT)
     
-    def __save__result__as_gif(self, array_result, type, explored_states):
-        result = array_result[len(array_result) - 1]
-        # print(type)
-        # print(f"Stari intermediare pana la solutie {explored_states}")
-        # print(f"Numar de miscari de pull {result.undo_moves}")
+    def save_result__as_gif(self, array_result, type):
         save_images(array_result, os.path.join("images", self.testname, type))
         create_gif(os.path.join("images", self.testname, type), self.testname,  os.path.join("gif", type))
+
+    def get_statistics(self, last_state, explored_states, method_name, tm):
+        return {
+            "name" : self.testname,
+            "method": method_name,
+            "explored_states": explored_states,
+            "solution_length": last_state.explored_states,
+            "undo_moves": last_state.undo_moves,
+            "time" : tm
+        }
+
