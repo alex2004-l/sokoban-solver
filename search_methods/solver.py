@@ -10,7 +10,7 @@ import time
 IDA_STAR = "ida_star"
 BEAM_SEARCH = "beam_search"
 BEAM_WIDTH = 30
-BEAM_LIMIT = 1000000
+BEAM_LIMIT = 100000
 
 class Solver:
     def __init__(self, map: Map, heuristic : Callable, testname : str, cache_heuristic : bool = False) -> None:

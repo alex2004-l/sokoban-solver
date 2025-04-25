@@ -6,7 +6,6 @@ from matplotlib import pyplot as plt
 from typing import Optional
 import yaml
 import os
-import sys
 
 OBSTACLE_SYMBOL = 1
 BOX_SYMBOL = 2
@@ -57,9 +56,12 @@ class Map:
             self.map[box_x][box_y] = BOX_SYMBOL
 
         self.targets = []
+        self.corner_targets = []
         for target_x, target_y in targets:
             self.targets.append((target_x, target_y))
             self.map[target_x][target_y] = TARGET_SYMBOL
+            if self.check_corner((target_x, target_y)):
+                self.corner_targets.append((target_x, target_y))
 
     @classmethod
     def from_str(cls, state_str):
@@ -354,7 +356,6 @@ class Map:
 
         print(f"Map has been saved to {path}")
 
-
     def _create_figure(
         self, 
         show: bool = True, 
@@ -442,10 +443,57 @@ class Map:
         if (left and above) or (left and below) or (right and above) or (right and below):
             return True
         return False
+    
+    def static_deadlock_cells(self):
+        empty_corners = []
+        for row in range(self.length):
+            for column in range(self.width):
+                if self.map[row][column] == 0 and self.check_corner((row, column)):
+                    empty_corners.append((row, column))
+                # if (row, column) in self.corner_targets and (row, column) in self.positions_of_boxes:
+                #     empty_corners.append((row, column))
+        
+        result = set()
 
-    def box_on_corner(self):
-        for target in self.targets:
-            if target in self.positions_of_boxes and self.check_corner(target):
-                self.targets.remove(target)
-                self.positions_of_boxes.pop(target)
+        for i in range(len(empty_corners)):
+            for j in range(i + 1, len(empty_corners)):
+                row_i, col_i = empty_corners[i]
+                row_j, col_j = empty_corners[j]
+
+                if not row_i == row_j and not col_i == col_j:
+                    continue
+
+                current_set = []
+                not_deadlock = False
+
+                if row_i == row_j:
+                    for c in range(min(col_i, col_j) + 1, max(col_i, col_j)):
+                        if self.map[row_i][c] == 0:
+                            current_set.append((row_i, c))
+                        if self.map[row_i][c] == BOX_SYMBOL or self.map[row_i][c] == OBSTACLE_SYMBOL:
+                            break
+                        if self.map[row_i][c] == TARGET_SYMBOL:
+                            not_deadlock = True
+                            break
+                else:
+                    for r in range(min(row_i, row_j) + 1, max(row_i, row_j)):
+                        if self.map[r][col_i] == 0:
+                            current_set.append((r, col_i))
+                        if self.map[r][col_i] == BOX_SYMBOL or self.map[r][col_i] == OBSTACLE_SYMBOL:
+                            break
+                        if self.map[r][col_i] == TARGET_SYMBOL:
+                            not_deadlock = True
+                            break
+
+                if not not_deadlock:
+                    result.update(current_set)
+        
+        result.update(empty_corners)
+        return result
+    
+    def check_deadlock(self, deadlock_cells):
+        for box in self.positions_of_boxes:
+            if box in deadlock_cells:
+                return True
+        return False
 
