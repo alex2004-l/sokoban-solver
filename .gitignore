@@ -3,4 +3,3 @@ images/*
 search_methods/__pycache__
 gif/*
 *.png
-*.csv
