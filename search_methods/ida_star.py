@@ -3,12 +3,12 @@ from typing import Callable
 
 counter = 0
 
-def ida_star(state : Map, heuristic: Callable):
+def ida_star(state : Map, heuristic):
     global counter
     counter = 0
     deadlock_cells = state.static_deadlock_cells()
 
-    threshold = heuristic(state)
+    threshold = heuristic.heuristic(state)
     path = [state]
     while True:
         visited = {}
@@ -18,7 +18,7 @@ def ida_star(state : Map, heuristic: Callable):
         if distance == float("inf"):
             return None, counter
         threshold = distance
-        # print(f"Threshold - {threshold}")
+        print(f"Threshold {threshold}")
 
 
 def ida_star_rec(state : Map, heuristic, distance, threshold, path, visited, deadlock_cells):
@@ -27,9 +27,6 @@ def ida_star_rec(state : Map, heuristic, distance, threshold, path, visited, dea
 
     if state.is_solved():
         return distance, True
-    
-    if state.check_deadlock(deadlock_cells):
-        return float("inf"), False
 
     # Transposition table
     key = state.serialize()
@@ -37,13 +34,15 @@ def ida_star_rec(state : Map, heuristic, distance, threshold, path, visited, dea
         return float("inf"), False
     visited[key] = distance
 
-    estimate = distance + heuristic(state)
+    estimate = distance + heuristic.heuristic(state)
     if estimate > threshold:
         return estimate, False
 
     min_estimate = float("inf")
     for neigh in state.get_neighbours_without_pull_moves():
         path.append(neigh)
+        if neigh.check_deadlock(deadlock_cells):
+            continue
         t, is_solved = ida_star_rec(neigh, heuristic, distance + 1, threshold, path, visited, deadlock_cells)
         if is_solved:
             return t, True

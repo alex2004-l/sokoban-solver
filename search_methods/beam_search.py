@@ -1,8 +1,7 @@
 from sokoban.map import Map
-from typing import Callable
 
-def beam_search(start: Map, heuristic : Callable, beam_width : int, limit : int):
-    beam = [(start, [start], heuristic(start))]
+def beam_search(start: Map, heuristic, beam_width : int, limit : int):
+    beam = [(start, [start], heuristic.heuristic(start))]
 
     discovered = set()
     discovered.add(start.serialize())
@@ -21,7 +20,7 @@ def beam_search(start: Map, heuristic : Callable, beam_width : int, limit : int)
                     continue
                 if neigh.serialize() not in discovered:
                     discovered.add(neigh.serialize())
-                    successors.append((neigh, seq + [neigh], heuristic(neigh)))
+                    successors.append((neigh, seq + [neigh], heuristic.heuristic(neigh)))
         beam = sorted(successors, key=lambda x: x[2])[:beam_width]
 
     return None, explored_states

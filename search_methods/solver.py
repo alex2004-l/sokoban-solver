@@ -2,43 +2,39 @@ from sokoban.gif import save_images, create_gif
 from search_methods.ida_star import ida_star
 from search_methods.beam_search import beam_search
 from sokoban.map import Map
+from search_methods.heuristics import Heuristic
 from typing import Callable
-import pandas as pd
 import os
 import time
 
 IDA_STAR = "ida_star"
 BEAM_SEARCH = "beam_search"
-BEAM_WIDTH = 30
+BEAM_WIDTH = 110
 BEAM_LIMIT = 100000
 
 class Solver:
-    def __init__(self, map: Map, heuristic : Callable, testname : str, cache_heuristic : bool = False) -> None:
+    def __init__(self, map: Map, testname : str, cache_heuristic : bool = False) -> None:
         self.map = map
-        self.heuristic = heuristic
+        self.heuristic = Heuristic()
         self.testname = testname
         self.statistics = []
-        # Add heuristic precalculation
-        if cache_heuristic:
-            self.heuristic_cost = {}
 
     def solve(self):
         self.solve_ida_star()
         self.solve_beam_search()
-        print(self.statistics)
+        return self.statistics
 
     def generic_solve(self, alg_name: str, func : Callable, *args):
         start_time = time.time()
         result, explored_states = func(self.map, self.heuristic, *args)
         total_time = time.time() - start_time
-
         print(f"{self.testname} - {total_time}")
 
         if not result:
             print(f"{alg_name} didn't find a result")
         else:
             last_state = result[len(result) - 1]
-            self.save_result__as_gif(result, alg_name)
+            # self.save_result__as_gif(result, alg_name)
             self.statistics.append(self.get_statistics(last_state, explored_states, alg_name, total_time))
 
     def solve_ida_star(self):
@@ -58,6 +54,9 @@ class Solver:
             "explored_states": explored_states,
             "solution_length": last_state.explored_states,
             "undo_moves": last_state.undo_moves,
-            "time" : tm
+            "time" : tm,
+            "heuristic" : "best",
+            "no_pulls" : True,
+            "caching" : True
         }
 
