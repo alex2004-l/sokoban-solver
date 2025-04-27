@@ -1,5 +1,4 @@
 from sokoban import Map
-from typing import Callable
 
 counter = 0
 
@@ -18,7 +17,6 @@ def ida_star(state : Map, heuristic):
         if distance == float("inf"):
             return None, counter
         threshold = distance
-        print(f"Threshold {threshold}")
 
 
 def ida_star_rec(state : Map, heuristic, distance, threshold, path, visited, deadlock_cells):
@@ -27,9 +25,6 @@ def ida_star_rec(state : Map, heuristic, distance, threshold, path, visited, dea
 
     if state.is_solved():
         return distance, True
-    
-    if state.check_deadlock(deadlock_cells):
-        return float("inf"), False
 
     # Transposition table
     key = state.serialize()

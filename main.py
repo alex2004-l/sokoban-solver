@@ -1,29 +1,19 @@
+import os
+import sys
 from sokoban import Map
 from search_methods.solver import Solver
-import os
-import shutil
-
-def delete_images():
-    image_directory = "images"
-    for img_dir in os.listdir(image_directory):
-        dir_path = os.path.join(image_directory, img_dir)
-        if os.path.isdir(dir_path):
-            shutil.rmtree(dir_path)
 
 if __name__ == '__main__':
-    test_directory = "tests"
 
-    statistics = []
+    algorithm = sys.argv[1]
+    input_file = sys.argv[2]
 
-    for test in os.listdir(test_directory):
-        test_name = os.path.join(test_directory, test)
-        crt_map = Map.from_yaml(test_name)
-        test = test.split(".")[0]
-        print(f"Start solving {test}")
+    crt_map = Map.from_yaml(input_file)
+    filename = os.path.basename(input_file)
+    filename = filename.split(".")[0]
 
-        solver = Solver(crt_map, test, cache_heuristic=False)
-        statistics += solver.solve()
-        print(f"Finished processing test {test}")
-    print(statistics)
+    print(f"Start solving {filename} with {algorithm}")
+    solver = Solver(crt_map, filename, algorithm, cache_heuristic=True)
+    solver.solve()
 
-    delete_images()
+    print(f"Finished processing test {filename}")

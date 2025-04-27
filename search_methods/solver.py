@@ -1,28 +1,32 @@
+import os
+import time
+from typing import Callable
 from sokoban.gif import save_images, create_gif
 from search_methods.ida_star import ida_star
 from search_methods.beam_search import beam_search
 from sokoban.map import Map
 from search_methods.heuristics import Heuristic
-from typing import Callable
-import os
-import time
 
-IDA_STAR = "ida_star"
-BEAM_SEARCH = "beam_search"
+IDA_STAR = "ida*"
+BEAM_SEARCH = "beam-search"
 BEAM_WIDTH = 30
 BEAM_LIMIT = 100000
 
 class Solver:
-    def __init__(self, map: Map, testname : str, cache_heuristic : bool = False) -> None:
+    def __init__(self, map: Map, testname : str, algorithm : str, cache_heuristic : bool = False) -> None:
         self.map = map
         self.heuristic = Heuristic(cache_heuristic)
         self.testname = testname
+        self.algoritm = algorithm
         self.statistics = []
 
     def solve(self):
-        self.solve_ida_star()
-        self.solve_beam_search()
-        return self.statistics
+        if self.algoritm == IDA_STAR:
+            self.solve_ida_star()
+        elif self.algoritm == BEAM_SEARCH:
+            self.solve_beam_search()
+        else:
+            print("Unknown algorithm")
 
     def generic_solve(self, alg_name: str, func : Callable, *args):
         start_time = time.time()
@@ -34,7 +38,6 @@ class Solver:
             print(f"{alg_name} didn't find a result")
         else:
             last_state = result[len(result) - 1]
-            print(len(result))
             self.save_result__as_gif(result, alg_name)
             self.statistics.append(self.get_statistics(last_state, explored_states, alg_name, total_time))
 
@@ -56,7 +59,7 @@ class Solver:
             "solution_length": last_state.explored_states,
             "undo_moves": last_state.undo_moves,
             "time" : tm,
-            "heuristic" : "third",
+            "heuristic" : "best",
             "no_pulls" : True,
             "caching" : self.heuristic.precalculated is not None
         }
