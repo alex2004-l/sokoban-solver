@@ -27,6 +27,9 @@ def ida_star_rec(state : Map, heuristic, distance, threshold, path, visited, dea
 
     if state.is_solved():
         return distance, True
+    
+    if state.check_deadlock(deadlock_cells):
+        return float("inf"), False
 
     # Transposition table
     key = state.serialize()
@@ -40,9 +43,9 @@ def ida_star_rec(state : Map, heuristic, distance, threshold, path, visited, dea
 
     min_estimate = float("inf")
     for neigh in state.get_neighbours_without_pull_moves():
-        path.append(neigh)
         if neigh.check_deadlock(deadlock_cells):
             continue
+        path.append(neigh)
         t, is_solved = ida_star_rec(neigh, heuristic, distance + 1, threshold, path, visited, deadlock_cells)
         if is_solved:
             return t, True

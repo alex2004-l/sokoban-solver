@@ -9,13 +9,13 @@ import time
 
 IDA_STAR = "ida_star"
 BEAM_SEARCH = "beam_search"
-BEAM_WIDTH = 110
+BEAM_WIDTH = 30
 BEAM_LIMIT = 100000
 
 class Solver:
     def __init__(self, map: Map, testname : str, cache_heuristic : bool = False) -> None:
         self.map = map
-        self.heuristic = Heuristic()
+        self.heuristic = Heuristic(cache_heuristic)
         self.testname = testname
         self.statistics = []
 
@@ -34,7 +34,8 @@ class Solver:
             print(f"{alg_name} didn't find a result")
         else:
             last_state = result[len(result) - 1]
-            # self.save_result__as_gif(result, alg_name)
+            print(len(result))
+            self.save_result__as_gif(result, alg_name)
             self.statistics.append(self.get_statistics(last_state, explored_states, alg_name, total_time))
 
     def solve_ida_star(self):
@@ -55,8 +56,8 @@ class Solver:
             "solution_length": last_state.explored_states,
             "undo_moves": last_state.undo_moves,
             "time" : tm,
-            "heuristic" : "best",
+            "heuristic" : "third",
             "no_pulls" : True,
-            "caching" : True
+            "caching" : self.heuristic.precalculated is not None
         }
 
