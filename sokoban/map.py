@@ -56,12 +56,9 @@ class Map:
             self.map[box_x][box_y] = BOX_SYMBOL
 
         self.targets = []
-        self.corner_targets = []
         for target_x, target_y in targets:
             self.targets.append((target_x, target_y))
             self.map[target_x][target_y] = TARGET_SYMBOL
-            if self.check_corner((target_x, target_y)):
-                self.corner_targets.append((target_x, target_y))
 
     @classmethod
     def from_str(cls, state_str):
@@ -432,9 +429,13 @@ class Map:
         return '\n'.join(aligned_corner)
 
     def serialize(self):
-        return self.__str__()
+        '''Serializes the object - only takes into account the player position and the box positions'''
+        player_pos = (self.player.x, self.player.y)
+        box_positions = frozenset(self.positions_of_boxes.keys())
+        return (player_pos, box_positions)
     
     def check_corner(self, coord):
+        '''Checks if a certain coordinate is a corner'''
         row, column = coord
         left = column - 1 < 0 or self.map[row][column - 1] == OBSTACLE_SYMBOL
         right = column + 1 >= self.width or self.map[row][column + 1] == OBSTACLE_SYMBOL
@@ -445,13 +446,12 @@ class Map:
         return False
     
     def static_deadlock_cells(self):
+        '''Precalculates the static deadlock cells for the map'''
         empty_corners = []
         for row in range(self.length):
             for column in range(self.width):
                 if self.map[row][column] == 0 and self.check_corner((row, column)):
                     empty_corners.append((row, column))
-                # if (row, column) in self.corner_targets and (row, column) in self.positions_of_boxes:
-                #     empty_corners.append((row, column))
         
         result = set()
 
@@ -492,8 +492,8 @@ class Map:
         return result
     
     def check_deadlock(self, deadlock_cells):
+        '''Checks if it's a deadlock map'''
         for box in self.positions_of_boxes:
             if box in deadlock_cells:
                 return True
         return False
-

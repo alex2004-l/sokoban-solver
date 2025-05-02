@@ -2,8 +2,8 @@ import os
 import time
 from typing import Callable
 from sokoban.gif import save_images, create_gif
-from search_methods.ida_star import ida_star
-from search_methods.beam_search import beam_search
+from search_methods.ida_star import ida_star, ida_star_with_pulls
+from search_methods.beam_search import beam_search, beam_search_with_pulls
 from sokoban.map import Map
 from search_methods.heuristics import Heuristic
 
@@ -13,11 +13,12 @@ BEAM_WIDTH = 30
 BEAM_LIMIT = 100000
 
 class Solver:
-    def __init__(self, map: Map, testname : str, algorithm : str, cache_heuristic : bool = False) -> None:
+    def __init__(self, map: Map, testname : str, algorithm : str, pulls_allowed:bool, cache_heuristic : bool = False) -> None:
         self.map = map
         self.heuristic = Heuristic(cache_heuristic)
         self.testname = testname
         self.algoritm = algorithm
+        self.pulls_allowed = pulls_allowed
         self.statistics = []
 
     def solve(self):
@@ -27,8 +28,11 @@ class Solver:
             self.solve_beam_search()
         else:
             print("Unknown algorithm")
+        print(self.statistics)
+        
 
     def generic_solve(self, alg_name: str, func : Callable, *args):
+        '''Generic solving class for any algorithm'''
         start_time = time.time()
         result, explored_states = func(self.map, self.heuristic, *args)
         total_time = time.time() - start_time
@@ -38,14 +42,20 @@ class Solver:
             print(f"{alg_name} didn't find a result")
         else:
             last_state = result[len(result) - 1]
-            self.save_result__as_gif(result, alg_name)
+            # self.save_result__as_gif(result, alg_name)
             self.statistics.append(self.get_statistics(last_state, explored_states, alg_name, total_time))
 
     def solve_ida_star(self):
-        self.generic_solve(IDA_STAR, ida_star)
+        if self.pulls_allowed:
+            self.generic_solve(IDA_STAR, ida_star_with_pulls)
+        else:
+            self.generic_solve(IDA_STAR, ida_star)
 
     def solve_beam_search(self):
-        self.generic_solve(BEAM_SEARCH, beam_search, BEAM_WIDTH, BEAM_LIMIT)
+        if self.pulls_allowed:
+            self.generic_solve(BEAM_SEARCH, beam_search, BEAM_WIDTH, BEAM_LIMIT)
+        else:
+            self.generic_solve(BEAM_SEARCH, beam_search, BEAM_WIDTH, BEAM_LIMIT)
     
     def save_result__as_gif(self, array_result, type):
         save_images(array_result, os.path.join("images", self.testname, type))

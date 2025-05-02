@@ -4,7 +4,6 @@ from sokoban import Map
 from search_methods.solver import Solver
 
 if __name__ == '__main__':
-
     algorithm = sys.argv[1]
     input_file = sys.argv[2]
 
@@ -13,7 +12,7 @@ if __name__ == '__main__':
     filename = filename.split(".")[0]
 
     print(f"Start solving {filename} with {algorithm}")
-    solver = Solver(crt_map, filename, algorithm, cache_heuristic=True)
+    solver = Solver(crt_map, filename, algorithm, pulls_allowed=False, cache_heuristic=True)
     solver.solve()
 
     print(f"Finished processing test {filename}")
