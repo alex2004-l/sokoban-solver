@@ -16,4 +16,4 @@ medium_map1,beam_search,655,27,0,0.05452537536621094,best,True,True,False
 medium_map2,ida_star,243813,32,0,6.791455268859863,best,True,True,False
 medium_map2,beam_search,826,32,0,0.07278180122375488,best,True,True,False
 super_hard_map1,ida_star,33647275,53,0,993.2739634513855,best,True,True,False
-super_hard_map1,beam_search,5570,57,0,0.664043664932251,best,True,True
+super_hard_map1,beam_search,5570,57,0,0.664043664932251,best,True,True,False
